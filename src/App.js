@@ -1,23 +1,78 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css"; // Import CSS file for styling
+
+import React, { useEffect, useRef, useState } from "react";
+
+import io from "socket.io-client";
+
+const socket = io("http://localhost:4000", {
+  withCredentials: true,
+});
 
 function App() {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [username, setUsername] = useState("");
+  const asked = useRef(false);
+  useEffect(() => {
+    if (!asked.current) {
+      asked.current = true;
+      getUsername();
+    }
+  }, []);
+
+  const getUsername = () => {
+    const name = window.prompt("Please enter your username:");
+    if (name && name.trim() !== "") {
+      setUsername(name.trim());
+    } else {
+      // If username is not provided, prompt again
+      getUsername();
+    }
+  };
+
+  useEffect(() => {
+    socket.on("message", (message) => {
+      setMessages([...messages, message]);
+    });
+  }, [messages]);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (input.trim() !== "") {
+      socket.emit("message", { username, message: input }); // Include username with message
+      setInput("");
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1>Soumya Chat App</h1>
+      {username ? <p>{username}</p> : <></>}
+      <div className="chat-box">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={
+              message.username === username ? "my-message" : "other-message"
+            }
+          >
+            <strong>{message.username}: </strong>
+            {message.message}
+          </div>
+        ))}
+      </div>
+      <form onSubmit={sendMessage}>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type your message..."
+          className="message-input"
+        />
+        <button type="submit" className="send-button">
+          Send
+        </button>
+      </form>
     </div>
   );
 }
