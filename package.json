@@ -15,8 +15,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start && node ./server/server.js",
-    "startBothServer": "node ./server/server.js",
+    "startReact": "react-scripts start",
+    "startServer": "node ./server/server.js",
+    "startBothServer":"start npm run startServer & start npm run startReact",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
