@@ -15,7 +15,7 @@ app.use(cors({
 
 const io = require("socket.io")(server, {
     cors: {
-      origin: process.env.APP_URL ?  process.env.APP_URL: "http://localhost:3000",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
       credentials: true
     }
